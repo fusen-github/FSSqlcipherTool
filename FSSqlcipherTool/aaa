@@ -1,0 +1,44 @@
+#!/bin/sh
+
+#  SqlcipherTool.sh
+#  FSSqlcipherTool
+#
+#  Created by 付森 on 2021/1/22.
+#  
+
+
+clear
+
+echo '********************************'
+echo '************** 1.加密 ***********'
+echo '************** 2.解密 ***********'
+echo '************** 3.退出 ***********'
+echo '********************************'
+
+# 加密文件
+function encryptFile() {
+    echo "调用加密"
+}
+
+# 解密文件
+function decryptFile() {
+    echo "调用解密"
+}
+
+
+echo "请选择"
+
+read flag
+
+if [ $flag == "1" ]
+then
+    encryptFile
+elif [ $flag == "2" ]
+then
+    decryptFile
+else
+    echo "退出"
+fi
+
+
+

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+#  Script.sh
+#  FSSqlcipherTool
+#
+#  Created by 付森 on 2021/1/22.
+#
+
+
+
+echo '我爱中国'
+
+cd "/Users/NavInfo/Desktop/splcipher"
+
+# 进入交互命令
+sqlite3 coremap.sqlite << EOF
+.tables
+EOF

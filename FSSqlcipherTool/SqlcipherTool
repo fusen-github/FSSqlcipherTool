@@ -1,0 +1,136 @@
+#!/bin/sh
+
+#  SqlcipherTool.sh
+#  FSSqlcipherTool
+#
+#  Created by 付森 on 2021/1/22.
+#  
+
+
+clear
+
+echo '********************************'
+echo '************** 1.加密 ***********'
+echo '************** 2.解密 ***********'
+echo '************** 3.退出 ***********'
+echo '********************************'
+
+echo "请选择"
+
+read flag
+
+### 加密文件
+function encryptFile() {
+# 清屏
+clear
+
+echo "请输入需要加密数据库文件全路径"
+read filePath
+
+# -f 参数判断 $file 是否存在
+if [ ! -f "$filePath" ]; then
+    echo "文件不存在"
+    return
+fi
+
+echo "加密前数据库路径: $filePath"
+
+echo "请输入密码(至少6位字母/数字)"
+
+password=""
+
+while(( ${#password} < 6 ))
+do
+    read password
+    
+    if [ ${#password} -lt 6 ]
+    then
+        echo "密码至少是6位，请重新输入"
+    fi
+done
+
+# 文件路径
+path=${filePath%.*}
+
+# 扩展名
+extension=${filePath##*.}
+echo "文件扩展名: $extension"
+
+newPath="${path}_encrypt.${extension}"
+    
+#  打开数据库 (<< EOF 进入交互式程序. 注意 << 和EOF中间有空格)
+sqlcipher ${filePath} << EOF
+ATTACH DATABASE "${newPath}" AS encrypt KEY "${password}";
+SELECT sqlcipher_export ('encrypt');
+DETACH DATABASE encrypt;
+.q
+EOF
+# 注意上面EOF之间的命令必须紧挨着 中间不能有注释，最好顶满格
+
+echo "加密后文件路径: ${newPath}"
+echo "加密结束"
+}
+
+
+### 解密文件
+function decryptFile() {
+# 清屏
+clear
+
+echo "请输入需要解密数据库文件全路径"
+read filePath
+
+# -f 参数判断 $file 是否存在
+if [ ! -f "$filePath" ]; then
+    echo "文件不存在"
+    return
+fi
+
+echo "解密前数据库路径: $filePath"
+
+echo "请输入密码(至少6位字母/数字)"
+
+password=""
+
+while(( ${#password} < 6 ))
+do
+    read password
+    
+    if [ ${#password} -lt 6 ]
+    then
+        echo "密码至少是6位，请重新输入"
+    fi
+done
+
+# 文件路径
+path=${filePath%.*}
+
+# 扩展名
+extension=${filePath##*.}
+echo "文件扩展名: $extension"
+
+newPath="${path}_decrypt.${extension}"
+
+sqlcipher ${filePath} << EOF
+PRAGMA key = "${password}";
+ATTACH DATABASE "${newPath}" AS plaintext KEY "";
+SELECT sqlcipher_export("plaintext");
+DETACH DATABASE plaintext;
+.q
+EOF
+echo "解密完成"
+
+}
+
+
+
+if [ $flag == "1" ]
+then
+    encryptFile
+elif [ $flag == "2" ]
+then
+    decryptFile
+else
+    echo "退出"
+fi
+
